@@ -1,0 +1,44 @@
+.mereo-pins-icon   { font-size: 14px; color: #9fd3e8; }
+.mereo-pins-header { font-weight: bold; color: #F2A81E; }
+
+/* the row of 6 pins */
+.mereo-pin-row { spacing: 8px; padding: 6px 4px; }
+
+.mereo-pin {
+  border-radius: 12px;
+  padding: 10px 8px;
+  min-width: 70px;
+  border: 1px solid rgba(232,101,14,0.25);
+  background-color: rgba(43,26,18,0.6);
+  transition-duration: 150ms;
+}
+.mereo-pin:hover { background-color: rgba(232,101,14,0.22); border-color: #E8650E; }
+
+.mereo-pin.free .mereo-pin-ico     { color: #F2A81E; font-size: 20px; }
+.mereo-pin.assigned                { border-color: rgba(160,215,240,0.7); background-color: rgba(30,55,72,0.7); }
+.mereo-pin.assigned .mereo-pin-ico { color: #b8e6f7; font-size: 20px; }
+
+.mereo-pin-ico { font-size: 20px; }
+.mereo-pin-cap { font-size: 10px; color: #F5E6CC; padding-top: 4px; }
+
+/* freeze (ice) + thaw (ember) — PRE-BAKED textures, just faded/scaled at runtime */
+.mereo-pin-freeze {
+  background-image: url("frost.png");
+  background-size: cover;
+  border-radius: 10px;
+}
+.mereo-pin-thaw {
+  background-image: url("ember.png");
+  background-size: cover;
+  border-radius: 10px;
+}
+
+/* the "click a window to pin" hint banner */
+.mereo-pin-hint {
+  background-color: rgba(18,38,52,0.94);
+  color: #d8f0fb;
+  border: 1px solid rgba(160,215,240,0.6);
+  border-radius: 14px;
+  padding: 11px 22px; font-size: 14px;
+  text-shadow: 0 0 10px rgba(120,200,235,0.6);
+}

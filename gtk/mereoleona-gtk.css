@@ -1,0 +1,79 @@
+/* >>> MEREOLEONA FIRE LAYER START <<< */
+/* Vermillion accent overlay. Works for both GTK3 and GTK4/libadwaita.
+   Unknown @define-color names are harmless on the version that ignores them. */
+
+/* GTK4 / libadwaita accent */
+@define-color accent_color        #E8650E;
+@define-color accent_bg_color     #E8650E;
+@define-color accent_fg_color     #160C07;
+@define-color destructive_color   #C8341E;
+@define-color success_color       #C2B23E;
+@define-color warning_color       #F2A81E;
+
+/* GTK3 named colors */
+@define-color theme_selected_bg_color #E8650E;
+@define-color theme_selected_fg_color #160C07;
+@define-color selected_bg_color       #E8650E;
+@define-color selected_fg_color       #160C07;
+@define-color link_color              #F2A81E;
+@define-color visited_link_color      #B5471B;
+
+/* Selections — molten */
+*:selected,
+*:selected:focus,
+row:selected,
+.view:selected {
+  background-color: rgba(232, 101, 14, 0.88);
+  color: #FFF6E6;
+}
+selection {
+  background-color: rgba(200, 52, 30, 0.55);
+  color: #FFF6E6;
+}
+
+/* Sidebar / list selection gets an ember edge */
+.sidebar row:selected,
+list row:selected {
+  box-shadow: inset 3px 0 0 #F2A81E;
+}
+
+/* Focus glow */
+entry:focus-within,
+spinbutton:focus-within,
+textview:focus-within {
+  border-color: #E8650E;
+  box-shadow: 0 0 0 1px rgba(232, 101, 14, 0.55);
+}
+
+/* Progress + level bars blaze */
+progressbar > trough > progress,
+levelbar block.filled {
+  background-image: linear-gradient(to right, #C8341E, #E8650E, #F2A81E);
+  background-color: #E8650E;
+}
+
+/* Primary buttons = ember gradient */
+button.suggested-action,
+.suggested-action {
+  background-image: linear-gradient(to bottom, #F2811E, #C8341E);
+  color: #160C07;
+  border-color: #8C1F16;
+}
+button.suggested-action:hover {
+  background-image: linear-gradient(to bottom, #FFA13E, #E8420E);
+}
+
+/* Switches / checks accent */
+checkbutton check:checked,
+radiobutton radio:checked,
+switch:checked {
+  background-color: #E8650E;
+  color: #160C07;
+}
+
+/* Links */
+*:link, button.link { color: #F2A81E; }
+
+/* Scrollbar slider ember on hover */
+scrollbar slider:hover { background-color: #E8650E; }
+/* >>> MEREOLEONA FIRE LAYER END <<< */

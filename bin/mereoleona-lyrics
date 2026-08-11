@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+# Mereoleona desktop lyrics — pinnable frosted-glass overlay (small kitty window).
+# Pin/unpin: right-click the title bar -> "Always on Top" (+ "Always on Visible
+# Workspace" to keep it across desktops). Frost comes from blur-my-shell.
+ROOT="$HOME/.mereoleona"
+
+if ! command -v playerctl >/dev/null 2>&1; then
+  command -v notify-send >/dev/null && notify-send "🔥 Mereoleona Lyrics" "playerctl not installed."
+  echo "playerctl not installed — run: sudo apt install -y playerctl" >&2
+  exit 1
+fi
+
+if pgrep -f 'kitty.*mereoleona-lyrics' >/dev/null 2>&1; then
+  echo "lyrics already running"; exit 0
+fi
+
+if command -v kitty >/dev/null 2>&1; then
+  exec kitty \
+    --class mereoleona-lyrics --title "🔥 Lyrics — right-click title ▸ Always on Top" \
+    -o background_opacity=0.42 \
+    -o background=#1a0d08 \
+    -o window_padding_width=10 \
+    -o hide_window_decorations=no \
+    -o remember_window_size=yes \
+    -o initial_window_width=680 \
+    -o initial_window_height=220 \
+    -o confirm_os_window_close=0 \
+    -o font_size=16 \
+    python3 "$ROOT/music/mereoleona-lyrics.py"
+else
+  exec gnome-terminal --title="🔥 Lyrics" -- python3 "$ROOT/music/mereoleona-lyrics.py"
+fi

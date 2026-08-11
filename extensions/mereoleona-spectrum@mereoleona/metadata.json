@@ -1,0 +1,7 @@
+{
+  "uuid": "mereoleona-spectrum@mereoleona",
+  "name": "Mereoleona Spectrum",
+  "description": "Fire audio spectrum in the top bar, driven by cava.",
+  "shell-version": ["45", "46", "47"],
+  "version": 1
+}

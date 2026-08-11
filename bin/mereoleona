@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+# Mereoleona Vermillion — fire theme toggle for GNOME.
+ROOT="$HOME/.mereoleona"
+c_ember='\033[1;38;2;232;101;14m'; c_blue='\033[1;38;2;111;168;181m'; c_rst='\033[0m'
+
+case "${1:-status}" in
+  on|apply)    bash "$ROOT/scripts/apply.sh" ;;
+  off|restore) bash "$ROOT/scripts/restore.sh" ;;
+  toggle)      if [ -f "$ROOT/state/active" ]; then bash "$ROOT/scripts/restore.sh"; else bash "$ROOT/scripts/apply.sh"; fi ;;
+  live)        bash "$ROOT/scripts/setup-live-wallpaper.sh" ;;
+  wallpaper)   bash "$ROOT/scripts/gen-wallpaper.sh" "${2:-}" ;;
+  viz)         setsid "$ROOT/bin/mereoleona-viz" >/dev/null 2>&1 & echo "🔥 visualizer launched" ;;
+  viz-stop)    pkill -f 'kitty.*mereoleona-viz' 2>/dev/null && echo "visualizer stopped" || echo "no visualizer running" ;;
+  lyrics)      setsid "$ROOT/bin/mereoleona-lyrics" >/dev/null 2>&1 & echo "🔥 lyrics launched" ;;
+  lyrics-stop) pkill -f 'kitty.*mereoleona-lyrics' 2>/dev/null && echo "lyrics stopped" || echo "no lyrics running" ;;
+  bars)        gnome-extensions enable mereoleona-spectrum@mereoleona 2>/dev/null && echo "🔥 top-bar spectrum enabled" || echo "could not enable (logout/login once)" ;;
+  bars-stop)   gnome-extensions disable mereoleona-spectrum@mereoleona 2>/dev/null && echo "top-bar spectrum disabled" ;;
+  pins)        gnome-extensions enable mereoleona-pins@mereoleona 2>/dev/null && echo "❄ window-pin dashboard enabled" || echo "log out/in once to load it" ;;
+  pins-stop)   gnome-extensions disable mereoleona-pins@mereoleona 2>/dev/null && echo "window-pin dashboard disabled" ;;
+  play|pause)  playerctl play-pause 2>/dev/null || echo "install playerctl";;
+  next)        playerctl next 2>/dev/null || echo "install playerctl";;
+  prev)        playerctl previous 2>/dev/null || echo "install playerctl";;
+  status)
+     if [ -f "$ROOT/state/active" ]; then printf "${c_ember}🔥 Mereoleona theme: ON${c_rst}\n"
+     else printf "${c_blue}❄  Mereoleona theme: OFF (original MacTahoe-Dark)${c_rst}\n"; fi ;;
+  *)
+     printf "${c_ember}Mereoleona${c_rst} — Black Clover fire theme for GNOME\n\n"
+     echo "usage: mereoleona <command>"
+     echo "  on        apply the fire theme (reversible)"
+     echo "  off       restore your original MacTahoe-Dark setup"
+     echo "  toggle    flip between on/off"
+     echo "  status    show current state"
+     echo "  live      install Hidamari + enable the LIVE video wallpaper (big download)"
+     echo "  wallpaper [img]  regenerate wallpapers (optionally from a new image)"
+     echo "  viz       launch the fire audio visualizer (cava)"
+     echo "  viz-stop  close the visualizer"
+     echo "  lyrics    launch synced fire karaoke lyrics on the desktop"
+     echo "  lyrics-stop  close the lyrics"
+     echo "  play|next|prev   media controls (playerctl)"
+     ;;
+esac

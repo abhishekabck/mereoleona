@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+# ❄ freeze — the Mereoleona window-pin app. Standalone, independent of the theme.
+#   freeze            enable it (and set it to auto-start every login)
+#   freeze off        disable it (and stop it auto-starting)
+#   freeze status     show state
+ROOT="$HOME/.mereoleona"
+EXT="mereoleona-pins@mereoleona"
+DST="$HOME/.local/share/gnome-shell/extensions/$EXT"
+AUTO="$HOME/.config/autostart/mereoleona-freeze.desktop"
+c_ice='\033[1;38;2;160;215;240m'; c_rst='\033[0m'
+
+_install() { [ -f "$DST/extension.js" ] || cp -rf "$ROOT/extensions/$EXT" "$HOME/.local/share/gnome-shell/extensions/" 2>/dev/null; }
+_add_to_enabled() {
+  local CUR; CUR="$(gsettings get org.gnome.shell enabled-extensions 2>/dev/null)"
+  printf '%s' "$CUR" | grep -q "$EXT" && return
+  if [ "$CUR" = "@as []" ] || [ "$CUR" = "[]" ]; then gsettings set org.gnome.shell enabled-extensions "['$EXT']"
+  else gsettings set org.gnome.shell enabled-extensions "$(printf '%s' "$CUR" | sed "s/]$/, '$EXT']/")"; fi
+}
+
+case "${1:-on}" in
+  on|"")
+    _install
+    _add_to_enabled
+    mkdir -p "$HOME/.config/autostart"
+    cat > "$AUTO" <<EOF
+[Desktop Entry]
+Type=Application
+Name=❄ Mereoleona Freeze (window pins)
+Exec=bash -c 'sleep 9; gnome-extensions enable $EXT'
+X-GNOME-Autostart-enabled=true
+NoDisplay=true
+EOF
+    if gnome-extensions enable "$EXT" 2>/dev/null && gnome-extensions info "$EXT" 2>/dev/null | grep -qi 'State: ACTIVE'; then
+      printf "${c_ice}❄ Freeze is ON — look for the ❄ icon in your top bar.${c_rst}\n"
+    else
+      printf "${c_ice}❄ Freeze set up + will auto-start. Log out & back in once to load it (first time only).${c_rst}\n"
+    fi
+    ;;
+  off|stop)
+    gnome-extensions disable "$EXT" 2>/dev/null
+    rm -f "$AUTO" 2>/dev/null
+    echo "❄ Freeze is OFF."
+    ;;
+  status)
+    gnome-extensions info "$EXT" 2>/dev/null | grep -iE 'name|state' | sed 's/^ *//' || echo "not installed"
+    ;;
+  *)
+    echo "usage: freeze [on|off|status]"
+    ;;
+esac

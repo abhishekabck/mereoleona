@@ -1,0 +1,20 @@
+# Mereoleona top-bar spectrum — cava raw output for the panel extension
+[general]
+framerate = 30
+bars = 14
+autosens = 1
+
+[input]
+method = pulse
+source = auto
+
+[output]
+method = raw
+raw_target = /dev/stdout
+data_format = ascii
+ascii_max_range = 8
+bar_delimiter = 59
+frame_delimiter = 10
+
+[smoothing]
+noise_reduction = 0.8

@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+# Mereoleona fire audio visualizer — cava in a borderless, transparent kitty window.
+# Falls back to gnome-terminal if kitty isn't installed.
+ROOT="$HOME/.mereoleona"
+
+if ! command -v cava >/dev/null 2>&1; then
+  command -v notify-send >/dev/null && notify-send "🔥 Mereoleona Visualizer" "cava not installed. Run:\nsudo apt install -y cava playerctl kitty"
+  echo "cava not installed — run: sudo apt install -y cava playerctl kitty" >&2
+  exit 1
+fi
+
+# ensure our fire cava config is in place
+mkdir -p "$HOME/.config/cava"
+[ -f "$ROOT/music/cava-config" ] && cp -f "$ROOT/music/cava-config" "$HOME/.config/cava/config"
+
+# don't open a second instance
+if pgrep -f 'kitty.*mereoleona-viz' >/dev/null 2>&1; then
+  echo "visualizer already running"; exit 0
+fi
+
+if command -v kitty >/dev/null 2>&1; then
+  exec kitty \
+    --class mereoleona-viz --title "🔥 Mereoleona Visualizer" \
+    -o hide_window_decorations=yes \
+    -o background_opacity=0.0 \
+    -o background=#000000 \
+    -o window_padding_width=0 \
+    -o confirm_os_window_close=0 \
+    -o remember_window_size=yes \
+    -o font_size=6 \
+    cava
+else
+  exec gnome-terminal --title="🔥 Mereoleona Visualizer" -- cava
+fi

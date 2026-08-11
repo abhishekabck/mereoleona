@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# 👆 fixfp — release a stuck fingerprint reader. Run this ANY time the fingerprint
+# instantly fails / says "exhausted". After running the repair script once, this
+# needs no password.
+c='\033[1;38;2;160;215;240m'; r='\033[0m'
+if sudo -n systemctl restart fprintd 2>/dev/null; then
+  printf "${c}👆 reader released — try your finger again.${r}\n"
+else
+  echo "Releasing the reader (type your password if asked)…"
+  sudo systemctl restart fprintd && printf "${c}👆 done — try your finger again.${r}\n"
+fi
