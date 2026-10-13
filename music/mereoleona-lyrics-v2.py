@@ -178,8 +178,10 @@ class LyricsOverlay(Gtk.Window):
         # Drawing area (sized to just wrap the text + padding)
         h_px = font_size + self.PAD_Y * 2
         self._da = Gtk.DrawingArea()
-        self._da.set_size_request(200, h_px)   # width grows on first draw
+        self._da.set_size_request(200, h_px)
         self._da.connect('draw', self._on_draw)
+        self._da.add_events(Gdk.EventMask.BUTTON_PRESS_MASK)
+        self._da.connect('button-press-event', self._on_press)
         self.add(self._da)
 
         self.connect('destroy', Gtk.main_quit)
@@ -190,6 +192,9 @@ class LyricsOverlay(Gtk.Window):
         self._track_pos   = 0.0
         self._play_status = "Stopped"
         self._last_idx    = -2
+        self._disp        = 0.0   # current playback position (secs)
+        self._line_ts     = 0.0   # synced start time of current line
+        self._next_ts     = 0.0   # synced start time of next line (0 = last)
 
         GLib.timeout_add(55, self._tick)   # ~18 fps
 
@@ -200,6 +205,11 @@ class LyricsOverlay(Gtk.Window):
     def _on_key(self, _w, ev):
         if ev.keyval in (Gdk.KEY_q, Gdk.KEY_Escape, Gdk.KEY_Q):
             Gtk.main_quit()
+        return False
+
+    def _on_press(self, _widget, ev):
+        if ev.button == 1:
+            self.begin_move_drag(1, int(ev.x_root), int(ev.y_root), ev.time)
         return False
 
     def _reposition(self):
@@ -218,6 +228,15 @@ class LyricsOverlay(Gtk.Window):
         else:
             self.move(geo.x, geo.y + geo.height - h - 64)
 
+    # fire gradient stops (same palette as v1)
+    _FIRE = [
+        (200/255, 52/255,  30/255),
+        (232/255, 101/255, 14/255),
+        (242/255, 168/255, 30/255),
+        (255/255, 214/255, 107/255),
+        (255/255, 246/255, 230/255),
+    ]
+
     def _on_draw(self, widget, cr):
         alloc = widget.get_allocation()
         w, h  = alloc.width, alloc.height
@@ -230,28 +249,52 @@ class LyricsOverlay(Gtk.Window):
         if not self._line:
             return False
 
+        # Progress through the current line (0.0 → 1.0)
+        if self._next_ts > self._line_ts:
+            progress = (self._disp - self._line_ts) / (self._next_ts - self._line_ts)
+            progress = max(0.0, min(1.0, progress))
+        else:
+            progress = 1.0   # last line or no next — fully lit
+
         # Measure text
         layout = widget.create_pango_layout(self._line)
         desc   = Pango.FontDescription.from_string(f"Sans Bold {self._font_size}")
         layout.set_font_description(desc)
         tw, th = layout.get_pixel_size()
 
-        # Pill behind the text, centred in the allocated area
         bw = tw + self.PAD_X * 2
         bh = th + self.PAD_Y * 2
         bx = (w - bw) / 2
         by = (h - bh) / 2
-        r  = bh / 2   # full pill
+        r  = bh / 2
 
+        # Background pill
         cr.set_operator(cairo.OPERATOR_OVER)
         cr.set_source_rgba(*self._bg)
         _rounded_rect(cr, bx, by, bw, bh, r)
         cr.fill()
 
-        # Text
-        cr.set_source_rgba(*self._fg)
-        cr.move_to(bx + self.PAD_X, by + self.PAD_Y)
+        tx, ty = bx + self.PAD_X, by + self.PAD_Y
+
+        # 1. Dim unplayed text (full width)
+        a = self._fg[3] if len(self._fg) > 3 else 1.0
+        cr.set_source_rgba(self._fg[0]*0.3, self._fg[1]*0.3, self._fg[2]*0.3, a)
+        cr.move_to(tx, ty)
         PangoCairo.show_layout(cr, layout)
+
+        # 2. Fire-coloured played portion (clipped left→right)
+        if progress > 0:
+            cr.save()
+            cr.rectangle(tx - 1, ty - 2, tw * progress + 1, th + 4)
+            cr.clip()
+            grad = cairo.LinearGradient(tx, 0, tx + tw, 0)
+            n = len(self._FIRE)
+            for i, (fr, fg, fb) in enumerate(self._FIRE):
+                grad.add_color_stop_rgba(i / (n - 1), fr, fg, fb, a)
+            cr.set_source(grad)
+            cr.move_to(tx, ty)
+            PangoCairo.show_layout(cr, layout)
+            cr.restore()
 
         return False
 
@@ -303,16 +346,22 @@ class LyricsOverlay(Gtk.Window):
 
         if 0 <= idx < len(synced):
             new_line = synced[idx][1]
+            self._line_ts = synced[idx][0]
+            self._next_ts = synced[idx + 1][0] if idx + 1 < len(synced) else 0.0
         elif status == "fetching":
             new_line = "♪  loading lyrics…"
+            self._line_ts = self._next_ts = 0.0
         elif status == "error":
             new_line = "⚠  couldn't reach the lyrics server"
+            self._line_ts = self._next_ts = 0.0
         else:
             new_line = ""
+            self._line_ts = self._next_ts = 0.0
 
+        self._disp = disp
         if new_line != self._line:
             self._line = new_line
-            self._da.queue_draw()
+        self._da.queue_draw()   # redraw every tick for smooth progress
 
         return True   # keep timer alive
 
