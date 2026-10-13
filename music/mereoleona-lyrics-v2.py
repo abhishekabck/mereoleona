@@ -203,10 +203,13 @@ class LyricsOverlay(Gtk.Window):
         return False
 
     def _reposition(self):
-        display = Gdk.Display.get_default()
-        mon     = display.get_primary_monitor()
-        geo     = mon.get_geometry()
-        h       = self._font_size + self.PAD_Y * 2
+        import warnings
+        screen = Gdk.Screen.get_default()
+        h      = self._font_size + self.PAD_Y * 2
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            mon = screen.get_primary_monitor()
+            geo = screen.get_monitor_geometry(mon)
         self.resize(geo.width, h)
         if self._position == 'top':
             self.move(geo.x, geo.y + 52)
