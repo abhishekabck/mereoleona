@@ -2,6 +2,6 @@
   "uuid": "mereoleona-spectrum@mereoleona",
   "name": "Mereoleona Spectrum",
   "description": "Fire audio spectrum in the top bar, driven by cava.",
-  "shell-version": ["45", "46", "47"],
+  "shell-version": ["45", "46", "47", "48", "49", "50"],
   "version": 1
 }

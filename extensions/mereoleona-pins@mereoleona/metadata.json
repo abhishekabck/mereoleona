@@ -2,6 +2,6 @@
   "uuid": "mereoleona-pins@mereoleona",
   "name": "Mereoleona Pins",
   "description": "Pin/freeze windows: always-on-top + locked size + stacking, with an ice-freeze animation. Dashboard from the top bar.",
-  "shell-version": ["45", "46", "47"],
+  "shell-version": ["45", "46", "47", "48", "49", "50"],
   "version": 1
 }

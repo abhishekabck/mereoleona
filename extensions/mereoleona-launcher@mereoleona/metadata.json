@@ -1,0 +1,7 @@
+{
+  "uuid": "mereoleona-launcher@mereoleona",
+  "name": "Mereoleona Launcher",
+  "description": "Quick launcher — run scripts, commands and multi-step jobs from the top bar. Fully configurable via a JSON file.",
+  "shell-version": ["45", "46", "47", "48", "49", "50", "51", "52"],
+  "version": 2
+}

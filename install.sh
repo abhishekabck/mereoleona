@@ -91,11 +91,25 @@ export PATH="$BIN_DIR:$PATH"
 # ── 7. Install GNOME Shell extensions ─────────────────────────────────────────
 say "Installing GNOME Shell extensions..."
 EXT_BASE="$HOME/.local/share/gnome-shell/extensions"
-for ext in mereoleona-pins@mereoleona mereoleona-spectrum@mereoleona; do
+for ext in mereoleona-pins@mereoleona mereoleona-spectrum@mereoleona mereoleona-launcher@mereoleona; do
     mkdir -p "$EXT_BASE/$ext"
     cp -rf "$INSTALL_DIR/extensions/$ext/." "$EXT_BASE/$ext/"
     ok "Extension installed: $ext"
 done
+
+# Create default launcher config if not already present
+LAUNCHER_CFG="$HOME/.config/mereoleona-launcher/entries.json"
+if [[ ! -f "$LAUNCHER_CFG" ]]; then
+    mkdir -p "$(dirname "$LAUNCHER_CFG")"
+    cat > "$LAUNCHER_CFG" << 'EOF'
+[
+  { "key": "Terminal",  "script": "kitty",      "icon": "🖥️" },
+  { "key": "Files",     "script": "nautilus ~", "icon": "📁" },
+  { "key": "Editor",    "script": "code ~",     "icon": "✏️" }
+]
+EOF
+    ok "Launcher config created: $LAUNCHER_CFG"
+fi
 
 # ── 8. Enable extensions in GNOME ─────────────────────────────────────────────
 say "Enabling extensions..."
@@ -113,6 +127,7 @@ _add_ext() {
 }
 _add_ext "mereoleona-pins@mereoleona"
 _add_ext "mereoleona-spectrum@mereoleona"
+_add_ext "mereoleona-launcher@mereoleona"
 ok "Extensions registered."
 
 # ── 9. Summary ────────────────────────────────────────────────────────────────

@@ -1,0 +1,208 @@
+/* ── DESIGN THIS FILE ─────────────────────────────────────────────────────────
+   List view classes:   mereo-launcher-*
+   Add form classes:    mereo-form-*
+   Reload: log out / log in (Wayland)
+   ─────────────────────────────────────────────────────────────────────────── */
+
+/* Full-screen dim layer behind the box */
+.mereo-launcher-backdrop {
+    background-color: rgba(0, 0, 0, 0.55);
+}
+
+/* The main floating card */
+.mereo-launcher-box {
+    width: 640px;
+    min-height: 80px;
+    max-height: 520px;
+    padding: 0;
+    border-radius: 12px;
+    background-color: #1e1e2e;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Row containing the search icon + text entry */
+.mereo-launcher-search-row {
+    padding: 14px 16px 10px;
+    spacing: 10px;
+}
+
+/* 🔍 icon */
+.mereo-launcher-search-icon {
+    font-size: 16px;
+}
+
+/* The text input */
+.mereo-launcher-search {
+    font-size: 15px;
+    background-color: transparent;
+    border: none;
+    color: #cdd6f4;
+    caret-color: #cba6f7;
+    /* St.Entry doesn't support box-shadow, use border-bottom instead: */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Scroll container for the list */
+.mereo-launcher-scroll {
+    /* grows to fill the box */
+}
+
+/* The vertical list of items */
+.mereo-launcher-list {
+    padding: 4px 0;
+    spacing: 0;
+}
+
+/* One entry row */
+.mereo-launcher-item {
+    padding: 9px 16px;
+    spacing: 12px;
+    border-radius: 0;
+}
+
+/* Hover / keyboard-selected state */
+.mereo-launcher-item:hover,
+.mereo-launcher-item.selected {
+    background-color: rgba(255, 255, 255, 0.07);
+}
+
+/* The emoji / icon column */
+.mereo-launcher-item-icon {
+    font-size: 16px;
+    min-width: 24px;
+}
+
+/* The key label (display name) */
+.mereo-launcher-item-key {
+    font-size: 13px;
+    font-weight: bold;
+    color: #cdd6f4;
+}
+
+/* The script/command path — greyed out hint */
+.mereo-launcher-item-script {
+    font-size: 11px;
+    font-family: 'Monospace';
+    color: #585b70;
+    max-width: 220px;
+}
+
+/* The ▶ Run button */
+.mereo-launcher-run-btn {
+    font-size: 11px;
+    font-weight: bold;
+    padding: 3px 10px;
+    border-radius: 6px;
+    background-color: rgba(203, 166, 247, 0.15);
+    color: #cba6f7;
+    border: 1px solid rgba(203, 166, 247, 0.25);
+}
+
+.mereo-launcher-run-btn:hover {
+    background-color: rgba(203, 166, 247, 0.3);
+}
+
+/* "N entries" footer */
+.mereo-launcher-count {
+    font-size: 10px;
+    color: #45475a;
+    padding: 4px 14px 8px;
+}
+
+/* The ⚡ icon in the top bar */
+.mereo-launcher-panel-icon {
+    font-size: 15px;
+    padding: 0 4px;
+}
+
+/* ── + Add button (search row, right side) ────────────────────────────────── */
+.mereo-launcher-add-btn {
+    font-size: 18px;
+    font-weight: bold;
+    padding: 0 10px;
+    border-radius: 6px;
+    color: #cba6f7;
+    background-color: rgba(203, 166, 247, 0.12);
+    border: 1px solid rgba(203, 166, 247, 0.2);
+}
+
+.mereo-launcher-add-btn:hover {
+    background-color: rgba(203, 166, 247, 0.28);
+}
+
+/* ── Add form ─────────────────────────────────────────────────────────────── */
+.mereo-launcher-form {
+    padding: 8px 0 4px;
+}
+
+.mereo-form-toprow {
+    padding: 4px 16px 10px;
+}
+
+.mereo-form-back-btn {
+    font-size: 12px;
+    padding: 3px 10px;
+    border-radius: 6px;
+    color: #a6adc8;
+    background-color: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.mereo-form-back-btn:hover {
+    background-color: rgba(255, 255, 255, 0.12);
+}
+
+/* One field row: label + entry */
+.mereo-form-field-row {
+    padding: 5px 16px;
+    spacing: 12px;
+}
+
+.mereo-form-label {
+    font-size: 12px;
+    color: #a6adc8;
+    min-width: 72px;
+}
+
+/* Full-width command entry */
+.mereo-form-entry {
+    font-size: 13px;
+    background-color: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    color: #cdd6f4;
+    padding: 4px 10px;
+}
+
+.mereo-form-entry:focus {
+    border-color: rgba(203, 166, 247, 0.5);
+}
+
+/* Short icon entry */
+.mereo-form-entry-short {
+    font-size: 14px;
+    background-color: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    color: #cdd6f4;
+    padding: 4px 10px;
+    max-width: 80px;
+}
+
+.mereo-form-save-row {
+    padding: 12px 16px 8px;
+}
+
+.mereo-form-save-btn {
+    font-size: 13px;
+    font-weight: bold;
+    padding: 6px 20px;
+    border-radius: 8px;
+    background-color: rgba(166, 227, 161, 0.2);
+    color: #a6e3a1;
+    border: 1px solid rgba(166, 227, 161, 0.35);
+}
+
+.mereo-form-save-btn:hover {
+    background-color: rgba(166, 227, 161, 0.35);
+}
