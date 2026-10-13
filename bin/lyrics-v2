@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# lyrics-v2 — single-line GTK lyrics overlay (no terminal)
+# Usage: lyrics-v2 [--bg COLOR] [--fg COLOR] [--size PX] [--pos top|bottom|center]
+exec python3 "$HOME/.mereoleona/music/mereoleona-lyrics-v2.py" "$@"

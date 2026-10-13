@@ -69,11 +69,11 @@ ok "Core files installed."
 # ── 5. Install CLI tools to ~/.local/bin ──────────────────────────────────────
 say "Linking CLI tools..."
 mkdir -p "$BIN_DIR"
-for tool in mereoleona freeze fixfp mereoleona-lyrics mereoleona-viz; do
+for tool in mereoleona freeze fixfp mereoleona-lyrics mereoleona-viz lyrics-v2; do
     cp -f "$INSTALL_DIR/bin/$tool" "$BIN_DIR/$tool"
     chmod +x "$BIN_DIR/$tool"
 done
-ok "CLI tools installed: mereoleona, freeze, fixfp, mereoleona-lyrics, mereoleona-viz"
+ok "CLI tools installed: mereoleona, freeze, fixfp, mereoleona-lyrics, mereoleona-viz, lyrics-v2"
 
 # ── 6. Ensure ~/.local/bin is in PATH ─────────────────────────────────────────
 SHELL_RC=""
