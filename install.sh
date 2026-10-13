@@ -69,11 +69,11 @@ ok "Core files installed."
 # ── 5. Install CLI tools to ~/.local/bin ──────────────────────────────────────
 say "Linking CLI tools..."
 mkdir -p "$BIN_DIR"
-for tool in mereoleona freeze fixfp mereoleona-lyrics mereoleona-viz lyrics-v2; do
+for tool in mereoleona freeze fixfp mereoleona-lyrics mereoleona-viz lyrics-v2 mereo-ext mereo-ext-ui; do
     cp -f "$INSTALL_DIR/bin/$tool" "$BIN_DIR/$tool"
     chmod +x "$BIN_DIR/$tool"
 done
-ok "CLI tools installed: mereoleona, freeze, fixfp, mereoleona-lyrics, mereoleona-viz, lyrics-v2"
+ok "CLI tools installed: mereoleona, freeze, fixfp, mereoleona-lyrics, mereoleona-viz, lyrics-v2, mereo-ext, mereo-ext-ui"
 
 # ── 6. Ensure ~/.local/bin is in PATH ─────────────────────────────────────────
 SHELL_RC=""
@@ -143,6 +143,8 @@ printf "    ${c_ember}mereoleona status${c_rst} — check state\n"
 printf "    ${c_ember}mereoleona off${c_rst}    — restore your original setup\n"
 printf "    ${c_ember}freeze on${c_rst}         — enable window-pin dashboard (❄ top bar)\n"
 printf "    ${c_ember}fixfp${c_rst}             — fix fingerprint reader if stuck\n"
+printf "    ${c_ember}mereo-ext list${c_rst}    — manage extensions (CLI)\n"
+printf "    ${c_ember}mereo-ext ui${c_rst}      — graphical extension manager\n"
 echo ""
 printf "  ${c_blue}Log out and back in once${c_rst} to activate fire window animations.\n"
 echo ""

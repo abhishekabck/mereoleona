@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+# mereo-ext-ui — Mereoleona Extension Manager (graphical)
+exec python3 "$HOME/.mereoleona/extensions/mereo-ext-ui/mereo-ext-ui.py" "$@"

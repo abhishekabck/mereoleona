@@ -1,0 +1,285 @@
+#!/usr/bin/env python3
+"""
+mereo-ext — Mereoleona extension manager
+
+  mereo-ext list                   list all extensions with status
+  mereo-ext install  <id>          install an extension
+  mereo-ext remove   <id>          remove an extension
+  mereo-ext enable   <id>          enable a GNOME Shell extension
+  mereo-ext disable  <id>          disable a GNOME Shell extension
+  mereo-ext info     <id>          show extension details
+  mereo-ext ui                     open the graphical manager
+"""
+import json, os, shutil, subprocess, sys
+
+MEREO_DIR = os.path.expanduser("~/.mereoleona")
+REGISTRY  = os.path.join(MEREO_DIR, "extensions", "registry.json")
+EXT_BASE  = os.path.expanduser("~/.local/share/gnome-shell/extensions")
+BIN_DIR   = os.path.expanduser("~/.local/bin")
+
+# ── ANSI colours ─────────────────────────────────────────────────────────────
+RST   = "\033[0m"
+BOLD  = "\033[1m"
+DIM   = "\033[2m"
+RED   = "\033[0;31m"
+GRN   = "\033[0;32m"
+YEL   = "\033[1;33m"
+BLU   = "\033[1;34m"
+CYN   = "\033[1;36m"
+EMBER = "\033[1;38;2;232;101;14m"
+GOLD  = "\033[1;38;2;242;168;30m"
+FIRE  = "\033[1;38;2;255;214;107m"
+PALE  = "\033[38;2;255;246;230m"
+
+
+def say(msg):  print(f"{EMBER}🔥 {msg}{RST}")
+def ok(msg):   print(f"{GRN}✓  {msg}{RST}")
+def warn(msg): print(f"{GOLD}⚠  {msg}{RST}")
+def err(msg):  print(f"{RED}✗  {msg}{RST}"); sys.exit(1)
+def run(*cmd, check=False):
+    return subprocess.run(list(cmd), capture_output=True, text=True, check=check)
+
+
+# ── registry ──────────────────────────────────────────────────────────────────
+
+def load_registry():
+    if not os.path.exists(REGISTRY):
+        err(f"Registry not found: {REGISTRY}\nRun install.sh first.")
+    with open(REGISTRY) as f:
+        return json.load(f)
+
+def find_ext(registry, eid):
+    m = next((e for e in registry if e["id"] == eid), None)
+    if not m:
+        ids = ", ".join(e["id"] for e in registry)
+        err(f"Unknown extension '{eid}'. Available: {ids}")
+    return m
+
+
+# ── status helpers ─────────────────────────────────────────────────────────────
+
+def gnome_installed(ext):
+    return os.path.isdir(os.path.join(EXT_BASE, ext["uuid"]))
+
+def gnome_enabled(ext):
+    r = run("gnome-extensions", "list", "--enabled")
+    return ext["uuid"] in r.stdout
+
+def app_installed(ext):
+    return os.path.isfile(os.path.join(BIN_DIR, ext["bin"]))
+
+def get_status(ext):
+    if ext["type"] == "gnome-shell":
+        if not gnome_installed(ext):
+            return "not-installed"
+        return "enabled" if gnome_enabled(ext) else "disabled"
+    else:
+        return "installed" if app_installed(ext) else "not-installed"
+
+def status_badge(status):
+    if status == "enabled":    return f"{GRN}● enabled{RST}"
+    if status == "disabled":   return f"{YEL}● disabled{RST}"
+    if status == "installed":  return f"{GRN}● installed{RST}"
+    return f"{DIM}○ not installed{RST}"
+
+
+# ── gsettings helper ──────────────────────────────────────────────────────────
+
+def gsettings_add_ext(uuid):
+    cur = run("gsettings", "get", "org.gnome.shell", "enabled-extensions").stdout.strip()
+    if uuid in cur:
+        return
+    if cur in ("@as []", "[]"):
+        new = f"['{uuid}']"
+    else:
+        new = cur[:-1] + f", '{uuid}']"
+    run("gsettings", "set", "org.gnome.shell", "enabled-extensions", new)
+
+def gsettings_rm_ext(uuid):
+    cur = run("gsettings", "get", "org.gnome.shell", "enabled-extensions").stdout.strip()
+    if uuid not in cur:
+        return
+    import re
+    new = re.sub(rf",?\s*'{re.escape(uuid)}'", "", cur)
+    new = re.sub(rf"'{re.escape(uuid)}',?\s*", "", new)
+    new = re.sub(r",\s*\]", "]", new).strip()
+    if new in (",", ""):
+        new = "@as []"
+    run("gsettings", "set", "org.gnome.shell", "enabled-extensions", new)
+
+
+# ── commands ──────────────────────────────────────────────────────────────────
+
+def cmd_list(_, registry):
+    print()
+    print(f"  {BOLD}{FIRE}{'ID':<14} {'NAME':<24} {'TYPE':<14} STATUS{RST}")
+    print(f"  {DIM}{'─'*62}{RST}")
+    for ext in registry:
+        status = get_status(ext)
+        icon   = ext["icon_emoji"]
+        tid    = f"{DIM}{'gnome-shell' if ext['type']=='gnome-shell' else 'app'}{RST}"
+        print(f"  {icon} {BOLD}{ext['id']:<13}{RST} {ext['short']:<24} {tid:<22} {status_badge(status)}")
+    print()
+    installed = sum(1 for e in registry if get_status(e) != "not-installed")
+    print(f"  {DIM}{installed}/{len(registry)} installed{RST}\n")
+
+
+def cmd_install(args, registry):
+    if not args:
+        err("Usage: mereo-ext install <id>")
+    ext    = find_ext(registry, args[0])
+    status = get_status(ext)
+
+    if ext["type"] == "gnome-shell":
+        src = os.path.join(MEREO_DIR, ext["source"])
+        dst = os.path.join(EXT_BASE, ext["uuid"])
+        if not os.path.isdir(src):
+            err(f"Source not found: {src}\nIs ~/.mereoleona populated? Run install.sh first.")
+        say(f"Installing {ext['name']} …")
+        os.makedirs(dst, exist_ok=True)
+        shutil.copytree(src, dst, dirs_exist_ok=True)
+        ok(f"Files copied → {dst}")
+        gsettings_add_ext(ext["uuid"])
+        run("gnome-extensions", "enable", ext["uuid"])
+        ok(f"Enabled: {ext['uuid']}")
+        warn("Log out and back in to activate the GNOME extension.")
+    else:
+        say(f"Installing {ext['name']} …")
+        for bf in ext.get("bin_files", []):
+            src = os.path.join(MEREO_DIR, bf)
+            dst = os.path.join(BIN_DIR, os.path.basename(bf))
+            if not os.path.isfile(src):
+                err(f"Source not found: {src}")
+            shutil.copy2(src, dst)
+            os.chmod(dst, 0o755)
+            ok(f"Installed: {dst}")
+        for sf in ext.get("source_files", []):
+            src = os.path.join(MEREO_DIR, sf)
+            if not os.path.isfile(src):
+                warn(f"Source file missing (skipped): {src}")
+        ok(f"{ext['name']} ready — run: {ext['bin']}")
+
+
+def cmd_remove(args, registry):
+    if not args:
+        err("Usage: mereo-ext remove <id>")
+    ext    = find_ext(registry, args[0])
+    status = get_status(ext)
+
+    if status == "not-installed":
+        warn(f"{ext['name']} is not installed.")
+        return
+
+    if ext["type"] == "gnome-shell":
+        say(f"Removing {ext['name']} …")
+        run("gnome-extensions", "disable", ext["uuid"])
+        gsettings_rm_ext(ext["uuid"])
+        dst = os.path.join(EXT_BASE, ext["uuid"])
+        if os.path.isdir(dst):
+            shutil.rmtree(dst)
+            ok(f"Removed: {dst}")
+        warn("Log out and back in to fully clear the extension from GNOME.")
+    else:
+        say(f"Removing {ext['name']} …")
+        for bf in ext.get("bin_files", []):
+            p = os.path.join(BIN_DIR, os.path.basename(bf))
+            if os.path.isfile(p):
+                os.remove(p)
+                ok(f"Removed: {p}")
+        ok(f"{ext['name']} removed.")
+
+
+def cmd_enable(args, registry):
+    if not args:
+        err("Usage: mereo-ext enable <id>")
+    ext = find_ext(registry, args[0])
+    if ext["type"] != "gnome-shell":
+        err(f"'{ext['id']}' is an app — use install/remove, not enable/disable.")
+    if not gnome_installed(ext):
+        err(f"{ext['name']} is not installed. Run: mereo-ext install {ext['id']}")
+    say(f"Enabling {ext['name']} …")
+    gsettings_add_ext(ext["uuid"])
+    run("gnome-extensions", "enable", ext["uuid"])
+    ok(f"Enabled. (Log out/in if the extension doesn't appear immediately.)")
+
+
+def cmd_disable(args, registry):
+    if not args:
+        err("Usage: mereo-ext disable <id>")
+    ext = find_ext(registry, args[0])
+    if ext["type"] != "gnome-shell":
+        err(f"'{ext['id']}' is an app — use install/remove, not enable/disable.")
+    say(f"Disabling {ext['name']} …")
+    run("gnome-extensions", "disable", ext["uuid"])
+    gsettings_rm_ext(ext["uuid"])
+    ok(f"Disabled.")
+
+
+def cmd_info(args, registry):
+    if not args:
+        err("Usage: mereo-ext info <id>")
+    ext    = find_ext(registry, args[0])
+    status = get_status(ext)
+    print()
+    print(f"  {ext['icon_emoji']}  {BOLD}{FIRE}{ext['name']}{RST}  {DIM}v{ext['version']}{RST}")
+    print(f"  {DIM}{'─'*50}{RST}")
+    print(f"  {ext['description']}")
+    print()
+    print(f"  {'ID':<16} {ext['id']}")
+    print(f"  {'Type':<16} {ext['type']}")
+    if ext["type"] == "gnome-shell":
+        print(f"  {'UUID':<16} {ext['uuid']}")
+    else:
+        print(f"  {'Command':<16} {ext['bin']}")
+    if ext.get("deps"):
+        print(f"  {'Requires':<16} {', '.join(ext['deps'])}")
+    if ext.get("requires_logout"):
+        print(f"  {'Note':<16} Requires logout/login to activate")
+    print(f"  {'Status':<16} ", end=""); print(status_badge(status))
+    print()
+
+
+def cmd_ui(_, registry):
+    ui = os.path.join(MEREO_DIR, "extensions", "mereo-ext-ui", "mereo-ext-ui.py")
+    if not os.path.isfile(ui):
+        err(f"UI not found: {ui}\nRun install.sh first.")
+    os.execvp("python3", ["python3", ui])
+
+
+COMMANDS = {
+    "list":    cmd_list,
+    "install": cmd_install,
+    "remove":  cmd_remove,
+    "enable":  cmd_enable,
+    "disable": cmd_disable,
+    "info":    cmd_info,
+    "ui":      cmd_ui,
+}
+
+HELP = f"""\
+{EMBER}mereo-ext{RST} — Mereoleona extension manager
+
+  {BOLD}mereo-ext list{RST}              list all extensions with status
+  {BOLD}mereo-ext install  <id>{RST}     install an extension
+  {BOLD}mereo-ext remove   <id>{RST}     remove / uninstall an extension
+  {BOLD}mereo-ext enable   <id>{RST}     enable a GNOME Shell extension
+  {BOLD}mereo-ext disable  <id>{RST}     disable a GNOME Shell extension
+  {BOLD}mereo-ext info     <id>{RST}     show extension details
+  {BOLD}mereo-ext ui{RST}                open the graphical manager
+"""
+
+
+def main():
+    argv = sys.argv[1:]
+    if not argv or argv[0] in ("-h", "--help", "help"):
+        print(HELP); return
+    cmd  = argv[0]
+    rest = argv[1:]
+    if cmd not in COMMANDS:
+        err(f"Unknown command '{cmd}'.\n{HELP}")
+    registry = load_registry()
+    COMMANDS[cmd](rest, registry)
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,83 @@
+[
+  {
+    "id": "pins",
+    "name": "Mereoleona Pins",
+    "short": "Pins",
+    "description": "Pin/freeze windows: always-on-top + locked size + stacking, with an ice-freeze animation. Dashboard from the top bar.",
+    "type": "gnome-shell",
+    "uuid": "mereoleona-pins@mereoleona",
+    "version": 1,
+    "icon_emoji": "📌",
+    "requires_logout": true,
+    "deps": [],
+    "source": "extensions/mereoleona-pins@mereoleona"
+  },
+  {
+    "id": "spectrum",
+    "name": "Mereoleona Spectrum",
+    "short": "Spectrum",
+    "description": "Fire audio spectrum visualizer in the top bar, driven by cava.",
+    "type": "gnome-shell",
+    "uuid": "mereoleona-spectrum@mereoleona",
+    "version": 1,
+    "icon_emoji": "🔥",
+    "requires_logout": true,
+    "deps": ["cava"],
+    "source": "extensions/mereoleona-spectrum@mereoleona"
+  },
+  {
+    "id": "launcher",
+    "name": "Mereoleona Launcher",
+    "short": "Launcher",
+    "description": "Spotlight-style quick launcher in the top bar. Run scripts and commands from a JSON config.",
+    "type": "gnome-shell",
+    "uuid": "mereoleona-launcher@mereoleona",
+    "version": 2,
+    "icon_emoji": "⚡",
+    "requires_logout": true,
+    "deps": [],
+    "source": "extensions/mereoleona-launcher@mereoleona"
+  },
+  {
+    "id": "lyrics",
+    "name": "Mereoleona Lyrics",
+    "short": "Lyrics",
+    "description": "Synced karaoke lyrics in your terminal. Fire gradient scrolling display. Fetches from lrclib.net.",
+    "type": "app",
+    "bin": "mereoleona-lyrics",
+    "version": 1,
+    "icon_emoji": "🎵",
+    "requires_logout": false,
+    "deps": ["playerctl"],
+    "source_files": ["music/mereoleona-lyrics.py"],
+    "bin_files": ["bin/mereoleona-lyrics"]
+  },
+  {
+    "id": "lyrics-v2",
+    "name": "Lyrics Overlay",
+    "short": "Lyrics v2",
+    "description": "Single-line GTK overlay showing the current lyric with a fire sweep animation. No terminal needed.",
+    "type": "app",
+    "bin": "lyrics-v2",
+    "version": 1,
+    "icon_emoji": "🎤",
+    "requires_logout": false,
+    "deps": ["playerctl", "python3-gi"],
+    "source_files": ["music/mereoleona-lyrics-v2.py"],
+    "bin_files": ["bin/lyrics-v2"]
+  },
+  {
+    "id": "viz",
+    "name": "Mereoleona Viz",
+    "short": "Visualizer",
+    "description": "Fire audio visualizer rendered in the terminal using cava.",
+    "type": "app",
+    "bin": "mereoleona-viz",
+    "version": 1,
+    "icon_emoji": "📊",
+    "requires_logout": false,
+    "deps": ["cava"],
+    "source_files": [],
+    "bin_files": ["bin/mereoleona-viz"]
+  }
+]
