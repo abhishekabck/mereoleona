@@ -1,0 +1,9 @@
+{
+  "name": "Mereoleona Timer",
+  "description": "Task timer with Jira ticket tracking, pause/resume, daily logs and export",
+  "uuid": "mereoleona-timer@mereoleona",
+  "version": "1",
+  "shell-version": ["45", "46", "47"],
+  "url": "https://github.com/Abhishek-Chaurasiya/mereoleona",
+  "settings-schema": "org.gnome.shell.extensions.mereoleona-timer"
+}

@@ -34,10 +34,15 @@ function saveEntries(entries) {
     }
 }
 
-function launch(raw) {
+function launch(raw, inTerminal = false) {
     const cmd = raw.replaceAll('~/', `${GLib.get_home_dir()}/`);
     try {
-        GLib.spawn_command_line_async(cmd);
+        if (inTerminal) {
+            // wrap in kitty; keep window open after the command finishes so output is readable
+            GLib.spawn_command_line_async(`kitty --hold bash -c ${GLib.shell_quote(cmd)}`);
+        } else {
+            GLib.spawn_command_line_async(cmd);
+        }
     } catch (e) {
         Main.notifyError('Mereoleona Launcher', String(e));
     }
@@ -168,6 +173,29 @@ class Launcher {
         this._fCmd.set_hint_text('e.g. code ~/Projects/Rise  or  ~/scripts/build.sh');
         this._fIcon.set_hint_text('🔥');
 
+        // terminal toggle row
+        const termRow = new St.BoxLayout({ style_class: 'mereo-form-field-row', reactive: true });
+        const termLabel = new St.Label({
+            text: 'Open in terminal',
+            style_class: 'mereo-form-label',
+            y_align: Clutter.ActorAlign.CENTER,
+            x_expand: true,
+        });
+        this._fTerminal = new St.Button({
+            label: '☐',
+            style_class: 'mereo-form-toggle-btn',
+            can_focus: true,
+            reactive: true,
+            y_align: Clutter.ActorAlign.CENTER,
+        });
+        this._terminalOn = false;
+        this._fTerminal.connect('clicked', () => {
+            this._terminalOn = !this._terminalOn;
+            this._fTerminal.set_label(this._terminalOn ? '☑' : '☐');
+        });
+        termRow.add_child(termLabel);
+        termRow.add_child(this._fTerminal);
+
         const saveRow = new St.BoxLayout({ style_class: 'mereo-form-save-row', reactive: true });
         const saveBtn = new St.Button({
             label: 'Save Entry',
@@ -183,6 +211,7 @@ class Launcher {
         this._formView.add_child(nameRow.row);
         this._formView.add_child(cmdRow.row);
         this._formView.add_child(iconRow.row);
+        this._formView.add_child(termRow);
         this._formView.add_child(saveRow);
     }
 
@@ -262,6 +291,8 @@ class Launcher {
         this._fName.set_text('');
         this._fCmd.set_text('');
         this._fIcon.set_text('');
+        this._terminalOn = false;
+        this._fTerminal.set_label('☐');
         this._fName.grab_key_focus();
         this._position();
     }
@@ -279,7 +310,7 @@ class Launcher {
         }
 
         const entries = loadEntries();
-        entries.push({ key, script, icon });
+        entries.push({ key, script, icon, terminal: this._terminalOn });
 
         if (saveEntries(entries)) {
             this._entries = entries;
@@ -334,7 +365,7 @@ class Launcher {
             });
             runBtn.connect('clicked', () => {
                 this.close();
-                launch(this._filtered[idx].script);
+                launch(this._filtered[idx].script, !!this._filtered[idx].terminal);
             });
 
             const row = new St.BoxLayout({
@@ -382,7 +413,7 @@ class Launcher {
             if (sym === Clutter.KEY_Up)    { this._select(this._selected - 1); return Clutter.EVENT_STOP; }
             if (sym === Clutter.KEY_Return || sym === Clutter.KEY_KP_Enter) {
                 const e = this._filtered[this._selected];
-                if (e) { this.close(); launch(e.script); }
+                if (e) { this.close(); launch(e.script, !!e.terminal); }
                 return Clutter.EVENT_STOP;
             }
         }

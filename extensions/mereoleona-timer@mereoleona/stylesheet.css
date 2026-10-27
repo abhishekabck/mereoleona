@@ -1,0 +1,143 @@
+/* ── panel label ─────────────────────────────────────────────────── */
+.mereo-timer-panel-label {
+    font-family: monospace;
+    font-size: 13px;
+    color: #f2a81e;
+    padding: 0 6px;
+}
+
+/* ── popup menu ──────────────────────────────────────────────────── */
+.mereo-timer-section-header {
+    font-size: 11px;
+    color: #e8650e;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.mereo-timer-running-label {
+    color: #f2a81e;
+    font-weight: bold;
+}
+
+.mereo-timer-elapsed {
+    font-family: monospace;
+    font-size: 15px;
+    color: #ffcb6b;
+}
+
+.mereo-timer-action-row {
+    spacing: 6px;
+}
+
+.mereo-timer-action-btn {
+    background-color: #2a1500;
+    color: #e8650e;
+    border: 1px solid #e8650e44;
+    border-radius: 6px;
+    padding: 3px 8px;
+    font-size: 12px;
+}
+
+.mereo-timer-action-btn:hover {
+    background-color: #3d2000;
+    border-color: #f2a81e;
+    color: #f2a81e;
+}
+
+.mereo-timer-start-btn {
+    color: #4caf50;
+    font-weight: bold;
+}
+
+.mereo-timer-entry {
+    background-color: #1a0e00;
+    color: #f2d490;
+    border: 1px solid #e8650e55;
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-size: 13px;
+}
+
+/* ── log window ──────────────────────────────────────────────────── */
+.mereo-timer-log-win {
+    background-color: #0d0800;
+    border: 1px solid #e8650e66;
+    border-radius: 12px;
+}
+
+.mereo-timer-log-box {
+    padding: 16px;
+    spacing: 10px;
+}
+
+.mereo-timer-log-header-row {
+    spacing: 8px;
+}
+
+.mereo-timer-log-title {
+    font-size: 16px;
+    color: #f2a81e;
+    font-weight: bold;
+}
+
+.mereo-timer-log-close {
+    background-color: #2a1500;
+    color: #e8650e;
+    border: 1px solid #e8650e44;
+    border-radius: 20px;
+    padding: 2px 8px;
+}
+
+.mereo-timer-log-close:hover {
+    background-color: #e8650e;
+    color: #0d0800;
+}
+
+.mereo-timer-log-filter-row {
+    spacing: 8px;
+}
+
+.mereo-timer-table-hdr {
+    spacing: 0;
+    background-color: #1a0e00;
+    border-radius: 6px;
+    padding: 6px 8px;
+}
+
+.mereo-timer-table-hdr-cell {
+    color: #e8650e;
+    font-size: 11px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    min-width: 90px;
+    padding: 0 4px;
+}
+
+.mereo-timer-scroll {
+    max-height: 380px;
+}
+
+.mereo-timer-table-row {
+    spacing: 0;
+    padding: 5px 8px;
+    border-bottom: 1px solid #2a1500;
+}
+
+.mereo-timer-table-row:nth-child(even) {
+    background-color: #110900;
+}
+
+.mereo-timer-table-cell {
+    color: #f2d490;
+    font-size: 13px;
+    min-width: 90px;
+    padding: 0 4px;
+}
+
+.mereo-timer-log-empty {
+    color: #e8650e88;
+    font-style: italic;
+    padding: 16px;
+}

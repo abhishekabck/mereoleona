@@ -32,7 +32,7 @@ fi
 
 # 2. Disable + remove extensions
 say "Disabling GNOME Shell extensions..."
-for ext in mereoleona-pins@mereoleona mereoleona-spectrum@mereoleona mereoleona-launcher@mereoleona; do
+for ext in mereoleona-pins@mereoleona mereoleona-spectrum@mereoleona mereoleona-launcher@mereoleona mereoleona-timer@mereoleona; do
     gnome-extensions disable "$ext" 2>/dev/null || true
     CUR="$(gsettings get org.gnome.shell enabled-extensions 2>/dev/null)"
     NEW="$(printf '%s' "$CUR" | sed "s/, '$ext'//g; s/'$ext', //g; s/'$ext'//g")"

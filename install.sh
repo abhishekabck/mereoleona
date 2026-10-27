@@ -91,7 +91,7 @@ export PATH="$BIN_DIR:$PATH"
 # ── 7. Install GNOME Shell extensions ─────────────────────────────────────────
 say "Installing GNOME Shell extensions..."
 EXT_BASE="$HOME/.local/share/gnome-shell/extensions"
-for ext in mereoleona-pins@mereoleona mereoleona-spectrum@mereoleona mereoleona-launcher@mereoleona; do
+for ext in mereoleona-pins@mereoleona mereoleona-spectrum@mereoleona mereoleona-launcher@mereoleona mereoleona-timer@mereoleona; do
     mkdir -p "$EXT_BASE/$ext"
     cp -rf "$INSTALL_DIR/extensions/$ext/." "$EXT_BASE/$ext/"
     ok "Extension installed: $ext"
@@ -128,6 +128,7 @@ _add_ext() {
 _add_ext "mereoleona-pins@mereoleona"
 _add_ext "mereoleona-spectrum@mereoleona"
 _add_ext "mereoleona-launcher@mereoleona"
+_add_ext "mereoleona-timer@mereoleona"
 ok "Extensions registered."
 
 # ── 9. Summary ────────────────────────────────────────────────────────────────

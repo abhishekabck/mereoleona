@@ -67,6 +67,19 @@
     "bin_files": ["bin/lyrics-v2"]
   },
   {
+    "id": "timer",
+    "name": "Mereoleona Timer",
+    "short": "Timer",
+    "description": "Task timer with Jira ticket tracking, pause/resume, daily logs, and table export.",
+    "type": "gnome-shell",
+    "uuid": "mereoleona-timer@mereoleona",
+    "version": 1,
+    "icon_emoji": "⏱",
+    "requires_logout": true,
+    "deps": [],
+    "source": "extensions/mereoleona-timer@mereoleona"
+  },
+  {
     "id": "viz",
     "name": "Mereoleona Viz",
     "short": "Visualizer",
