@@ -2,7 +2,7 @@
   "name": "Mereoleona Timer",
   "description": "Task timer with Jira ticket tracking, pause/resume, daily logs and export",
   "uuid": "mereoleona-timer@mereoleona",
-  "version": 2,
+  "version": 1,
   "shell-version": ["42", "43", "44", "45", "46", "47", "48", "49", "50", "51", "52"],
   "url": "https://github.com/abhishekabck/mereoleona"
 }

@@ -2,6 +2,7 @@
 import St from 'gi://St';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
+import GObject from 'gi://GObject';
 import Clutter from 'gi://Clutter';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
@@ -94,6 +95,7 @@ class TaskStore {
     }
 }
 
+const TimerIndicator = GObject.registerClass(
 class TimerIndicator extends PanelMenu.Button {
     _init() {
         super._init(0.0, 'Mereoleona Timer', false);
@@ -211,6 +213,7 @@ class TimerIndicator extends PanelMenu.Button {
     _afterAction() { this._updateLabel(); this._refreshMenu(); }
 
     _openLogWindow() {
+
         const log = readJSON(LOG_FILE, []);
         const win = new St.Widget({ style_class: 'mereo-timer-log-win', reactive: true, layout_manager: new Clutter.BinLayout() });
         const box = new St.BoxLayout({ style_class: 'mereo-timer-log-box', vertical: true, x_expand: true, y_expand: true });
@@ -285,7 +288,7 @@ class TimerIndicator extends PanelMenu.Button {
         win.set_size(Math.min(800, m.width - 80), Math.min(560, m.height - 100));
         win.set_position(m.x + Math.round((m.width - win.width) / 2), m.y + Math.round((m.height - win.height) / 2));
     }
-}
+}); // GObject.registerClass
 
 export default class MereoleonaTimer extends Extension {
     enable() {
