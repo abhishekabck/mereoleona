@@ -15,23 +15,15 @@ c_rst='\033[0m'
 
 # ── determine target date ─────────────────────────────────────────────────────
 TARGET=""
-for arg in "$@"; do
-    case "$arg" in
-        --today) TARGET="$(date +%F)" ;;
-        --date)  ;;   # handled below
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --today) TARGET="$(date +%F)"; shift ;;
+        --date)  TARGET="${2:-}"; shift 2 ;;
+        *)       shift ;;
     esac
 done
-# handle "--date YYYY-MM-DD"
-for i in "${!@}"; do
-    if [[ "${!i}" == "--date" ]]; then
-        next=$((i+1))
-        TARGET="${!next:-}"
-        break
-    fi
-done 2>/dev/null || true
 
 if [[ -z "$TARGET" ]]; then
-    # default: yesterday
     TARGET="$(date -d 'yesterday' +%F 2>/dev/null || date -v-1d +%F 2>/dev/null || echo "")"
     if [[ -z "$TARGET" ]]; then
         echo "Could not determine yesterday's date. Pass --today or --date YYYY-MM-DD." >&2
@@ -39,80 +31,66 @@ if [[ -z "$TARGET" ]]; then
     fi
 fi
 
-# ── read log ──────────────────────────────────────────────────────────────────
+# ── read + format in one python pass ──────────────────────────────────────────
 if [[ ! -f "$LOG" ]]; then
-    echo "No log found at $LOG. Start and complete a task first." >&2
-    exit 1
+    printf "${c_dim}No log found at %s. Start and complete a task first.${c_rst}\n" "$LOG"
+    exit 0
 fi
 
-# extract entries for target date using python3 (always available on Ubuntu)
-ENTRIES="$(python3 - "$LOG" "$TARGET" <<'PYEOF'
+OUTPUT="$(python3 -I - "$LOG" "$TARGET" <<'PYEOF'
 import json, sys
+
 log_path, target = sys.argv[1], sys.argv[2]
 with open(log_path) as f:
     data = json.load(f)
-entries = [e for e in data if e.get('date') == target]
+
+entries = [e for e in data if e.get("date") == target]
+if not entries:
+    sys.exit(1)
+
+divider = "───────────────────────────────────────────"
+lines = []
+lines.append(f"📋 Standup — {target}")
+lines.append(divider)
+
+total_secs = 0
 for e in entries:
-    secs = int(e.get('duration', 0))
+    secs = int(e.get("duration", 0))
+    total_secs += secs
     h, rem = divmod(secs, 3600)
     m = rem // 60
-    ticket = e.get('ticket', 'P')
-    task   = e.get('task', '')
-    status = e.get('status', '')
-    print(f"{ticket}\t{task}\t{h}h {m:02d}m\t{status}")
+    ticket = e.get("ticket", "P")
+    task = e.get("task", "")
+    status = e.get("status", "")
+    icon = "✓" if status == "completed" else "✗"
+    lines.append(f"{icon} {ticket:<13} {task:<44} {h}h {m:02d}m")
+
+lines.append(divider)
+th, trem = divmod(total_secs, 3600)
+tm = trem // 60
+count = len(entries)
+s = "s" if count != 1 else ""
+lines.append(f"Total: {th}h {tm:02d}m  ({count} task{s})")
+print("\n".join(lines))
 PYEOF
-)"
+)" || true
 
-# ── format output ─────────────────────────────────────────────────────────────
-DIVIDER="───────────────────────────────────────────"
-
-MSG=""
-MSG+="📋 Standup — ${TARGET}"$'\n'
-MSG+="${DIVIDER}"$'\n'
-
-TOTAL_SECS=0
-COUNT=0
-
-while IFS=$'\t' read -r ticket task duration status; do
-    [[ -z "$ticket" ]] && continue
-    icon="✓"
-    [[ "$status" == "stopped" ]] && icon="✗"
-    line="$(printf '%-14s %-45s %s' "${icon} ${ticket}" "${task}" "${duration}")"
-    MSG+="${line}"$'\n'
-    COUNT=$((COUNT + 1))
-    # accumulate seconds for total
-    raw_secs="$(python3 -c "
-import json
-with open('$LOG') as f:
-    data = json.load(f)
-total = sum(int(e.get('duration',0)) for e in data if e.get('date')=='$TARGET' and e.get('ticket')=='$ticket' and e.get('task')=='$task')
-print(total)
-" 2>/dev/null || echo 0)"
-    TOTAL_SECS=$((TOTAL_SECS + raw_secs))
-done <<< "$ENTRIES"
-
-if [[ $COUNT -eq 0 ]]; then
+if [[ -z "$OUTPUT" ]]; then
     printf "${c_dim}No completed tasks found for %s.${c_rst}\n" "$TARGET"
     exit 0
 fi
 
-# total duration
-TOTAL_H=$((TOTAL_SECS / 3600))
-TOTAL_M=$(( (TOTAL_SECS % 3600) / 60 ))
-MSG+="${DIVIDER}"$'\n'
-MSG+="$(printf 'Total: %dh %02dm  (%d task%s)' "$TOTAL_H" "$TOTAL_M" "$COUNT" "$([ $COUNT -ne 1 ] && echo s)")"$'\n'
-
-# ── print ──────────────────────────────────────────────────────────────────────
-printf "${c_gold}%s${c_rst}\n" "$MSG"
+# ── print ─────────────────────────────────────────────────────────────────────
+printf "${c_gold}%s${c_rst}\n" "$OUTPUT"
 
 # ── clipboard ─────────────────────────────────────────────────────────────────
-if command -v xclip &>/dev/null; then
-    printf '%s' "$MSG" | xclip -sel clipboard
+if command -v wl-copy &>/dev/null; then
+    printf '%s' "$OUTPUT" | wl-copy
+    printf "${c_grn}✓  Copied to clipboard${c_rst}\n"
+elif command -v xclip &>/dev/null; then
+    printf '%s' "$OUTPUT" | xclip -sel clipboard
     printf "${c_grn}✓  Copied to clipboard${c_rst}\n"
 elif command -v xsel &>/dev/null; then
-    printf '%s' "$MSG" | xsel --clipboard --input
-    printf "${c_grn}✓  Copied to clipboard${c_rst}\n"
-elif command -v wl-copy &>/dev/null; then
-    printf '%s' "$MSG" | wl-copy
+    printf '%s' "$OUTPUT" | xsel --clipboard --input
     printf "${c_grn}✓  Copied to clipboard${c_rst}\n"
 fi

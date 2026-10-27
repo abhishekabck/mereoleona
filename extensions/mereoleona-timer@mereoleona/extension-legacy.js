@@ -1,6 +1,6 @@
 // mereoleona-timer — GNOME 42-44 legacy (old-style imports)
 /* global imports, global */
-const { St, Gio, GLib, Clutter } = imports.gi;
+const { St, Gio, GLib, Clutter, GObject } = imports.gi;
 const Main      = imports.ui.main;
 const PanelMenu = imports.ui.panelMenu;
 const PopupMenu = imports.ui.popupMenu;
@@ -91,7 +91,8 @@ const TaskStore = class TaskStore {
     }
 };
 
-const TimerIndicator = class TimerIndicator extends PanelMenu.Button {
+const TimerIndicator = GObject.registerClass(
+class TimerIndicator extends PanelMenu.Button {
     _init() {
         super._init(0.0, 'Mereoleona Timer', false);
         this._store = new TaskStore();
@@ -295,7 +296,7 @@ const TimerIndicator = class TimerIndicator extends PanelMenu.Button {
         win.set_size(W, H);
         win.set_position(m.x + Math.round((m.width - W) / 2), m.y + Math.round((m.height - H) / 2));
     }
-};
+}); // GObject.registerClass
 
 // ── lifecycle ─────────────────────────────────────────────────────────────────
 let _indicator = null;
