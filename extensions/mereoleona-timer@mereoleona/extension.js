@@ -286,8 +286,10 @@ class TimerIndicator extends PanelMenu.Button {
         win.add_child(box);
         global.stage.add_child(win);
         const m = Main.layoutManager.primaryMonitor;
-        win.set_size(Math.min(800, m.width - 80), Math.min(560, m.height - 100));
-        win.set_position(m.x + Math.round((m.width - win.width) / 2), m.y + Math.round((m.height - win.height) / 2));
+        const W = Math.min(800, m.width - 80);
+        const H = Math.min(560, m.height - 100);
+        win.set_size(W, H);
+        win.set_position(m.x + Math.round((m.width - W) / 2), m.y + Math.round((m.height - H) / 2));
     }
 }); // GObject.registerClass
 
