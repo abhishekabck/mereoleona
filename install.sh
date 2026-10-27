@@ -70,8 +70,8 @@ ok "Core files installed."
 say "Linking CLI tools..."
 mkdir -p "$BIN_DIR"
 for tool in mereoleona freeze fixfp mereoleona-lyrics mereoleona-viz lyrics-v2 mereo-ext mereo-ext-ui mereo-standup; do
-    cp -f "$INSTALL_DIR/bin/$tool" "$BIN_DIR/$tool"
-    chmod +x "$BIN_DIR/$tool"
+    chmod +x "$INSTALL_DIR/bin/$tool"
+    ln -sf "$INSTALL_DIR/bin/$tool" "$BIN_DIR/$tool"
 done
 ok "CLI tools installed: mereoleona, freeze, fixfp, mereoleona-lyrics, mereoleona-viz, lyrics-v2, mereo-ext, mereo-ext-ui, mereo-standup"
 
