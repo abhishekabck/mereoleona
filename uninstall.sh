@@ -50,7 +50,7 @@ ok "Autostart entries removed."
 
 # 4. Remove CLI tools
 say "Removing CLI tools..."
-for tool in mereoleona freeze fixfp mereoleona-lyrics mereoleona-viz lyrics-v2 mereo-ext mereo-ext-ui; do
+for tool in mereoleona freeze fixfp mereoleona-lyrics mereoleona-viz lyrics-v2 mereo-ext mereo-ext-ui mereo-standup; do
     rm -f "$BIN_DIR/$tool"
 done
 ok "CLI tools removed."

@@ -80,6 +80,20 @@
     "source": "extensions/mereoleona-timer@mereoleona"
   },
   {
+    "id": "standup",
+    "name": "Mereo Standup",
+    "short": "Standup",
+    "description": "Reads yesterday's timer log and formats a standup message. Copies to clipboard automatically.",
+    "type": "app",
+    "bin": "mereo-standup",
+    "version": 1,
+    "icon_emoji": "📋",
+    "requires_logout": false,
+    "deps": ["python3"],
+    "source_files": [],
+    "bin_files": ["bin/mereo-standup"]
+  },
+  {
     "id": "viz",
     "name": "Mereoleona Viz",
     "short": "Visualizer",

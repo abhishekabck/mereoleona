@@ -69,11 +69,11 @@ ok "Core files installed."
 # ── 5. Install CLI tools to ~/.local/bin ──────────────────────────────────────
 say "Linking CLI tools..."
 mkdir -p "$BIN_DIR"
-for tool in mereoleona freeze fixfp mereoleona-lyrics mereoleona-viz lyrics-v2 mereo-ext mereo-ext-ui; do
+for tool in mereoleona freeze fixfp mereoleona-lyrics mereoleona-viz lyrics-v2 mereo-ext mereo-ext-ui mereo-standup; do
     cp -f "$INSTALL_DIR/bin/$tool" "$BIN_DIR/$tool"
     chmod +x "$BIN_DIR/$tool"
 done
-ok "CLI tools installed: mereoleona, freeze, fixfp, mereoleona-lyrics, mereoleona-viz, lyrics-v2, mereo-ext, mereo-ext-ui"
+ok "CLI tools installed: mereoleona, freeze, fixfp, mereoleona-lyrics, mereoleona-viz, lyrics-v2, mereo-ext, mereo-ext-ui, mereo-standup"
 
 # ── 6. Ensure ~/.local/bin is in PATH ─────────────────────────────────────────
 SHELL_RC=""
@@ -91,10 +91,28 @@ export PATH="$BIN_DIR:$PATH"
 # ── 7. Install GNOME Shell extensions ─────────────────────────────────────────
 say "Installing GNOME Shell extensions..."
 EXT_BASE="$HOME/.local/share/gnome-shell/extensions"
+
+# Detect GNOME Shell major version for legacy compatibility
+GNOME_VER=$(gnome-shell --version 2>/dev/null | grep -oP '\d+' | head -1)
+GNOME_VER=${GNOME_VER:-45}
+ok "Detected GNOME Shell $GNOME_VER"
+
+_install_ext() {
+    local uuid="$1"
+    local src="$INSTALL_DIR/extensions/$uuid"
+    local dst="$EXT_BASE/$uuid"
+    mkdir -p "$dst"
+    cp -rf "$src/." "$dst/"
+    # On GNOME 42-44, swap in the legacy (old-style imports) file
+    if [ "${GNOME_VER}" -lt 45 ] && [ -f "$dst/extension-legacy.js" ]; then
+        cp -f "$dst/extension-legacy.js" "$dst/extension.js"
+        warn "Using legacy format for $uuid (GNOME $GNOME_VER < 45)"
+    fi
+    ok "Extension installed: $uuid"
+}
+
 for ext in mereoleona-pins@mereoleona mereoleona-spectrum@mereoleona mereoleona-launcher@mereoleona mereoleona-timer@mereoleona; do
-    mkdir -p "$EXT_BASE/$ext"
-    cp -rf "$INSTALL_DIR/extensions/$ext/." "$EXT_BASE/$ext/"
-    ok "Extension installed: $ext"
+    _install_ext "$ext"
 done
 
 # Create default launcher config if not already present
@@ -145,7 +163,8 @@ printf "    ${c_ember}mereoleona off${c_rst}    — restore your original setup\
 printf "    ${c_ember}freeze on${c_rst}         — enable window-pin dashboard (❄ top bar)\n"
 printf "    ${c_ember}fixfp${c_rst}             — fix fingerprint reader if stuck\n"
 printf "    ${c_ember}mereo-ext list${c_rst}    — manage extensions (CLI)\n"
-printf "    ${c_ember}mereo-ext ui${c_rst}      — graphical extension manager\n"
+printf "    ${c_ember}mereo-ext ui${c_rst}      — graphical extension manager
+    ${c_ember}mereo-standup${c_rst}    — format yesterday's tasks as standup (copies to clipboard)\n"
 echo ""
 printf "  ${c_blue}Log out and back in once${c_rst} to activate fire window animations.\n"
 echo ""
