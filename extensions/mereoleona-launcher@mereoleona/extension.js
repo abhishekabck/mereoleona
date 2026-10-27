@@ -401,7 +401,7 @@ class Launcher {
 
     // ── keyboard ──────────────────────────────────────────────────────────────
 
-    _onKey(_actor, ev) {
+    _onKey(ev) {
         const sym = ev.get_key_symbol();
         if (sym === Clutter.KEY_Escape) {
             if (this._mode === 'add') this._showList();

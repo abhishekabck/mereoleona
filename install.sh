@@ -163,8 +163,8 @@ printf "    ${c_ember}mereoleona off${c_rst}    — restore your original setup\
 printf "    ${c_ember}freeze on${c_rst}         — enable window-pin dashboard (❄ top bar)\n"
 printf "    ${c_ember}fixfp${c_rst}             — fix fingerprint reader if stuck\n"
 printf "    ${c_ember}mereo-ext list${c_rst}    — manage extensions (CLI)\n"
-printf "    ${c_ember}mereo-ext ui${c_rst}      — graphical extension manager
-    ${c_ember}mereo-standup${c_rst}    — format yesterday's tasks as standup (copies to clipboard)\n"
+printf "    ${c_ember}mereo-ext ui${c_rst}      — graphical extension manager\n"
+printf "    ${c_ember}mereo-standup${c_rst}    — format yesterday's tasks as standup (copies to clipboard)\n"
 echo ""
 printf "  ${c_blue}Log out and back in once${c_rst} to activate fire window animations.\n"
 echo ""

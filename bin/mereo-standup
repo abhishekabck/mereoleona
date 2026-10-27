@@ -18,7 +18,7 @@ TARGET=""
 while [[ $# -gt 0 ]]; do
     case "$1" in
         --today) TARGET="$(date +%F)"; shift ;;
-        --date)  TARGET="${2:-}"; shift 2 ;;
+        --date)  TARGET="${2:-}"; shift; shift 2>/dev/null || true ;;
         *)       shift ;;
     esac
 done
