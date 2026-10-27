@@ -325,7 +325,7 @@ class Launcher {
     _filter() {
         const q = this._searchEntry.get_text().toLowerCase().trim();
         this._filtered = q
-            ? this._entries.filter(e => e.key.toLowerCase().includes(q))
+            ? this._entries.filter(e => (e.key || '').toLowerCase().includes(q))
             : [...this._entries];
         this._selected = 0;
         this._renderList();
